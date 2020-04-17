@@ -1,3 +1,5 @@
+Copyright © 2020 William Tao. All right reserved.
+    
 //#include <kipr/botball.h>
 #include "Data.h"
 
