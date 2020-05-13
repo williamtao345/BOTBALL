@@ -1,5 +1,3 @@
-Copyright © 2020 William Tao. All right reserved.
-    
 //#include <kipr/botball.h>
 #include "Data.h"
 
@@ -30,19 +28,30 @@ Copyright © 2020 William Tao. All right reserved.
 #define hand_closed_position 470
 /*  END   */
 
+/*  define ratios  */
+#define angle_ratio 50
+/*  END   */
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Initialize for C Programing DataBase~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 typedef int DataType;
 void set_arm(int);
 void set_hand(int);
+void catch_up_object();
+void put_down_object();
+void set_arm_position_with_two_parts(int percentage);
+void initBot();
+void catch_object(int object_number);
+int Length_CharString(char *p);
 void stop_running();
 int Insert_to_end_of_LinkList_for_tracks_recording(int left_speed, int right_speed, int time_of_running);
 void Clean_up_track_recording();
 void go_back_as_records();
 void motor_record(int left_speed, int right_speed, int time_of_running);
-void move_forward(int speed, int time_of_running);
+void move_forward(char speed, int time_of_running);
 void set_motor(int left_wheel_speed, int right_wheel_speed, int time_of_running);
 void change_direction(int degrees);
+int move_from_file();
 void follow_object(int object_number);
 
 /* ----------------------------------LinkList---------------------------------------- */
@@ -81,7 +90,7 @@ int StackFull(SeqStack(*S));
 
 /* ----------------------------------Record tracks---------------------------------- */
 
-int use_track_recording = 0;
+/* int use_track_recording = 0;
 typedef struct tracksRecording
 {
     int speed_of_left, speed_of_right, time_of_running;
@@ -160,13 +169,20 @@ void motor_record(int left_speed, int right_speed, int time_of_running)
 {
     set_motor(left_speed, right_speed, time_of_running);
     Insert_to_end_of_LinkList_for_tracks_recording(left_speed, right_speed, time_of_running);
-}
+} */
 
 /* ----------------------------------Move forward---------------------------------- */
-/*Speed is char from 1-100*/
+/*Speed is char from 1-100.                         */
 /*If speed is greater than 0 is running forward.    */
 /*If speed is less than 0 is running backward.      */
-void move_forward(int speed, int time_of_running)
+void move_forward(char speed, int time_of_running)
+{
+    motor(left_wheel_number, speed);
+    motor(right_wheel_number, speed);
+    msleep(time_of_running);
+}
+
+/* void move_forward(char speed, int time_of_running)
 {
     if (use_track_recording)
     {
@@ -178,7 +194,7 @@ void move_forward(int speed, int time_of_running)
         motor(right_wheel_number, speed);
         msleep(time_of_running);
     }
-}
+} */
 
 /*Set two motors' each speed and running time.*/
 /*If time_of_running is 0, no running time.*/
@@ -194,11 +210,21 @@ void stop_running()
 {
     set_motor(0, 0, 0);
 }
-
+/* ----------------------------------Change direction---------------------------------- */
 /*If degrees greater than 0 is turning left. */
 /*If degrees less than 0 is turning right.   */
-#define angle_ratio 50
 void change_direction(int degrees)
+{
+    if (degrees >= 0)
+    {
+        motor_record(-100, 100, degrees * angle_ratio);
+    }
+    else
+    {
+        motor_record(100, -100, degrees * angle_ratio);
+    }
+}
+/* void change_direction(int degrees)
 {
     if (use_track_recording)
     {
@@ -222,6 +248,32 @@ void change_direction(int degrees)
             motor_record(100, -100, degrees * angle_ratio);
         }
     }
+} */
+/* ----------------------------------Move from informations from files---------------------------------- */
+/*Form of file per line: "number of direction(int degrees)" "running speed(char speed)" "time of running(int time)"\n. */
+/*If degrees greater than 0 is turning left.        */
+/*If degrees less than 0 is turning right.          */
+/*Speed is char from 1-100.                         */
+/*If speed is greater than 0 is running forward.    */
+/*If speed is less than 0 is running backward.      */
+int move_from_file()
+{
+    FILE *file_of_movements = fopen("Input_of_movements.text", "a+");
+    if (!feof(file_of_movements))
+    {
+        return 0;
+    }
+
+    int degrees, time;
+    char speed;
+    do
+    {
+        fscanf(file_of_movements, "%d %c %d", &degrees, &speed, &time);
+        change_direction(degrees);
+        move_forward(speed, time);
+    } while (feof(file_of_movements));
+
+    return 1;
 }
 /* ----------------------------------Follow the Object---------------------------------- */
 /*If lose object, wait until find the object agian. */
@@ -230,11 +282,59 @@ void follow_object(int object_number)
     camera_open_black();
     camera_update();
     printf("%d\n", get_object_center_y(0, object_number));
+    while (get_object_center_y(0, object_number) < 110)
+    {
+        //printf("%d\n", get_object_center_y(0, object_number));
+        camera_update();
+        int object_center_x = get_object_center_x(0, object_number);
+        if (get_object_center_y(0, object_number) < 60)
+        {
+            if (object_center_x > 80)
+            {
+                set_motor(100, 50, 0);
+            }
+            else if (object_center_x < 80 && object_center_x > 0)
+            {
+                set_motor(50, 100, 0);
+            }
+            else if (object_center_x == 80)
+            {
+                set_motor(100, 100, 0);
+            }
+            else
+            {
+                set_motor(0, 0, 0);
+            }
+        }
+        else
+        {
+            if (object_center_x > 80)
+            {
+                set_motor(50, 10, 0);
+            }
+            else if (object_center_x < 80 && object_center_x > 0)
+            {
+                set_motor(10, 50, 0);
+            }
+            else
+            {
+                set_motor(30, 30, 0);
+            }
+        }
+    }
+
+    camera_close();
+}
+/* void follow_object(int object_number)
+{
+    camera_open_black();
+    camera_update();
+    printf("%d\n", get_object_center_y(0, object_number));
     if (use_track_recording)
     {
         while (get_object_center_y(0, object_number) < 110)
         {
-            printf("%d\n", get_object_center_y(0, object_number));
+            //printf("%d\n", get_object_center_y(0, object_number));
             camera_update();
             int object_center_x = get_object_center_x(0, object_number);
             if (get_object_center_y(0, object_number) < 60)
@@ -277,7 +377,7 @@ void follow_object(int object_number)
     {
         while (get_object_center_y(0, object_number) < 110)
         {
-            printf("%d\n", get_object_center_y(0, object_number));
+            //printf("%d\n", get_object_center_y(0, object_number));
             camera_update();
             int object_center_x = get_object_center_x(0, object_number);
             if (get_object_center_y(0, object_number) < 60)
@@ -317,7 +417,7 @@ void follow_object(int object_number)
         }
     }
     camera_close();
-}
+} */
 
 /* -----------------------------------Movement of servo----------------------------------- */
 void set_arm(int degree)
@@ -369,7 +469,7 @@ void initBot()
     set_servo_position(hand_servo_number, hand_open_position);
 }
 /* -----------------------------------Inset Programs----------------------------------- */
-void catch_object(object_number)
+void catch_object(int object_number)
 {
     initBot();
     follow_object(object_number);
