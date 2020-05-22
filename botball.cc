@@ -1,3 +1,5 @@
+//Copyright © 2020 William Tao.All right reserved.
+
 //#include <kipr/botball.h>
 #include "botball.h"
 #include "base_functions.h"
@@ -30,9 +32,9 @@
 // Define ratios 
 #define ANGLE_RATIO 50
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Initialize for C Programing DataBase~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Initialize for C Programing DataBase~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-/* typedef int DataType;
+    /* typedef int DataType;
 void SetArm(int);
 void SetHand(int);
 void CatchUpObject();
@@ -52,9 +54,9 @@ void ChangeDirection(int degrees);
 int MoveBotFromFile();
 void FollowObject(int object_number);
  */
-/* ----------------------------------LinkList---------------------------------------- */
+    /* ----------------------------------LinkList---------------------------------------- */
 
-/* typedef struct node
+    /* typedef struct node
 {
     DataType data;
     struct node *link;
@@ -68,8 +70,8 @@ int Remove_LinkNode(LinkList(*first), int i);
 LinkList String_to_LinkList(int *p, int length);
 void Printf_LinkList(LinkList x); */
 
-/* ----------------------------------Stack---------------------------------------- */
-/* #define initSize 20
+    /* ----------------------------------Stack---------------------------------------- */
+    /* #define initSize 20
 typedef int SElemType;
 typedef struct
 {
@@ -84,11 +86,11 @@ int GetTop(SeqStack *S);
 int StackEmpty(SeqStack(*S));
 int StackFull(SeqStack(*S)); */
 
-/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DataBase for botball~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DataBase for botball~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-/* ----------------------------------Record tracks---------------------------------- */
+    /* ----------------------------------Record tracks---------------------------------- */
 
-/* int use_track_recording = 0;
+    /* int use_track_recording = 0;
 typedef struct tracksRecording
 {
     int speed_of_left, speed_of_right, runningTime;
@@ -169,11 +171,12 @@ void motor_record(int left_speed, int right_speed, int runningTime)
     Insert_to_end_of_LinkList_for_tracks_recording(left_speed, right_speed, runningTime);
 } */
 
-/* ----------------------------------Move forward---------------------------------- */
-/*Speed is char from 1-100.                         */
-/*If speed is greater than 0 is running forward.    */
-/*If speed is less than 0 is running backward.      */
-void MoveForward(char speed, int runningTime)
+    /* ----------------------------------Move forward---------------------------------- */
+    /*Speed is char from 1-100.                         */
+    /*If speed is greater than 0 is running forward.    */
+    /*If speed is less than 0 is running backward.      */
+    void
+    MoveForward(char speed, int runningTime)
 {
     motor(LEFT_WHEEL_NUMBER, speed);
     motor(RIGHT_WHEEL_NUMBER, speed);
