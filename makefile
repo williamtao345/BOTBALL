@@ -1,8 +1,11 @@
-Botball: t1.o
-	gcc -o Botball t1.o; rm *.o
+Botball: botball.o main.o
+	gcc -o Botball t1.o main.o; rm *.o
 	
-t1.o:t1.c
-	gcc -c -o t1.o t1.c
+botball.o: botball.cc
+	gcc -c -o botball.o botball.cc
+
+main.o: main.c
+	gcc -c -o main.o main.c
 
 clean:
 	rm *.o Botball
